@@ -1,0 +1,70 @@
+{% load static %} {% load material_form %}
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <title>Say Hi!</title>
+  <link href="http://fonts.googleapis.com/css?family=Lato:300|Grand+Hotel" rel="stylesheet" type="text/css" />
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  {% include 'material/includes/material_css.html' %}
+  <script src="{% static 'material/js/jquery.js' %}"></script>
+  {% include 'material/includes/material_js.html' %}
+
+  <link href="{% static 'css/styles.css' %}" rel="stylesheet">
+
+</head>
+
+<body>
+
+  <div id="form-main">
+
+    <div id="form-div">
+
+      <h1>{% if user.is_authenticated %}Welcome {{ user.username }}!{% endif %}</h1>
+
+      <h2>Say Hi to your friends.</h2>
+
+      <form method="POST">
+
+        {% csrf_token %} {% form form=form %}{% endform %}
+        <button type="submit" name="_submit" class="btn">Say Hi!</button>
+
+      </form>
+
+      {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+        <li{% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+          {% endfor %}
+      </ul>
+      {% endif %}
+      <p id="his"></p>
+
+    </div>
+
+  </div>
+
+  <script>
+    $(function() {
+      var $his = $('#his')
+      $.ajax({
+        type: 'GET',
+        url: '/hi/?format=json',
+        success: function(his) {
+          $.each(his, function(i, hi) {
+            $his.append('<ul> <li><b>' + hi.sender + ' said Hi to you!</b></li> <li> ' + hi.date + '</li></ul>')
+          });
+        }
+      });
+    })
+  </script>
+
+</body>
+
+</html>
